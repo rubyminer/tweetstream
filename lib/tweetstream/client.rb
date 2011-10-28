@@ -35,7 +35,7 @@ module TweetStream
     def parser=(parser)
       @parser = parser_from(parser)
     end
-    
+
     # Create a new client with the Twitter credentials
     # of the account you want to be using its API quota.
     # You may also set the JSON parsing library as specified
@@ -47,16 +47,16 @@ module TweetStream
       self.access_secret = access_secret
       self.parser = parser
     end
-   
+
     # Returns all public statuses. The Firehose is not a generally
-    # available resource. Few applications require this level of access. 
-    # Creative use of a combination of other resources and various access 
-    # levels can satisfy nearly every application use case. 
+    # available resource. Few applications require this level of access.
+    # Creative use of a combination of other resources and various access
+    # levels can satisfy nearly every application use case.
     def firehose(query_parameters = {}, &block)
       start('statuses/firehose', query_parameters, &block)
     end
-    
-    # Returns all retweets. The retweet stream is not a generally available 
+
+    # Returns all retweets. The retweet stream is not a generally available
     # resource. Few applications require this level of access. Creative
     # use of a combination of other resources and various access levels
     # can satisfy nearly every application use case. As of 9/11/2009,
@@ -65,8 +65,8 @@ module TweetStream
     def retweet(query_parameters = {}, &block)
       start('statuses/retweet', query_parameters, &block)
     end
-    
-    # Returns a random sample of all public statuses. The default access level 
+
+    # Returns a random sample of all public statuses. The default access level
     # provides a small proportion of the Firehose. The "Gardenhose" access
     # level provides a proportion more suitable for data mining and
     # research applications that desire a larger proportion to be statistically
@@ -75,11 +75,11 @@ module TweetStream
       start('statuses/sample', query_parameters, &block)
     end
 
-    # Specify keywords to track. Queries are subject to Track Limitations, 
-    # described in Track Limiting and subject to access roles, described in 
-    # the statuses/filter method. Track keywords are case-insensitive logical 
+    # Specify keywords to track. Queries are subject to Track Limitations,
+    # described in Track Limiting and subject to access roles, described in
+    # the statuses/filter method. Track keywords are case-insensitive logical
     # ORs. Terms are exact-matched, and also exact-matched ignoring
-    # punctuation. Phrases, keywords with spaces, are not supported. 
+    # punctuation. Phrases, keywords with spaces, are not supported.
     # Keywords containing punctuation will only exact match tokens.
     # Query parameters may be passed as the last argument.
     def track(*keywords, &block)
@@ -88,8 +88,8 @@ module TweetStream
       filter(query_params.merge(:track => keywords), &block)
     end
 
-    # Returns public statuses from or in reply to a set of users. Mentions 
-    # ("Hello @user!") and implicit replies ("@user Hello!" created without 
+    # Returns public statuses from or in reply to a set of users. Mentions
+    # ("Hello @user!") and implicit replies ("@user Hello!" created without
     # pressing the reply "swoosh") are not matched. Requires integer user
     # IDs, not screen names. Query parameters may be passed as the last argument.
     def follow(*user_ids, &block)
@@ -101,7 +101,7 @@ module TweetStream
     def locations(coords, &block)
       filter(query_params.merge(:locations => coords), &block)
     end
-    
+
     # Make a call to the statuses/filter method of the Streaming API,
     # you may provide <tt>:follow</tt>, <tt>:track</tt> or both as options
     # to follow the tweets of specified users or track keywords. This
@@ -117,10 +117,10 @@ module TweetStream
       end
       start('statuses/filter', query_params.merge(:method => :post), &block)
     end
-    
+
     def site_follow(*user_ids, &block)
       query_params ||= {:follow => user_ids}
-      
+
       if query_params[:follow].is_a?(Array)
         query_params[:follow] = query_params[:follow].collect{|q| q.to_s}.join(',')
       elsif query_params[:follow]
@@ -128,10 +128,10 @@ module TweetStream
       end
       query_params[:site_streams] = query_params[:follow]
       query_params[:track] = ["foo"]
-      
+
       start('site', query_params.merge(:method => :post, :host => 'betastream.twitter.com', :version => '2b'), &block)
     end
-    
+
     # Set a Proc to be run when a deletion notice is received
     # from the Twitter stream. For example:
     #
@@ -141,7 +141,7 @@ module TweetStream
     #     end
     #
     # Block must take two arguments: the status id and the user id.
-    # If no block is given, it will return the currently set 
+    # If no block is given, it will return the currently set
     # deletion proc. When a block is given, the TweetStream::Client
     # object is returned to allow for chaining.
     def on_delete(&block)
@@ -152,7 +152,7 @@ module TweetStream
         @on_delete
       end
     end
-    
+
     # Set a Proc to be run when a rate limit notice is received
     # from the Twitter stream. For example:
     #
@@ -162,7 +162,7 @@ module TweetStream
     #     end
     #
     # Block must take one argument: the number of discarded tweets.
-    # If no block is given, it will return the currently set 
+    # If no block is given, it will return the currently set
     # limit proc. When a block is given, the TweetStream::Client
     # object is returned to allow for chaining.
     def on_limit(&block)
@@ -173,7 +173,7 @@ module TweetStream
         @on_limit
       end
     end
-    
+
     # Set a Proc to be run when an HTTP error is encountered in the
     # processing of the stream. Note that TweetStream will automatically
     # try to reconnect, this is for reference only. Don't panic!
@@ -184,7 +184,7 @@ module TweetStream
     #     end
     #
     # Block must take one argument: the error message.
-    # If no block is given, it will return the currently set 
+    # If no block is given, it will return the currently set
     # error proc. When a block is given, the TweetStream::Client
     # object is returned to allow for chaining.
     def on_error(&block)
@@ -195,7 +195,7 @@ module TweetStream
         @on_error
       end
     end
-    
+
     def start(path, query_parameters = {}, &block) #:nodoc:
 
       host = query_parameters.delete(:host) || 'stream.twitter.com'
@@ -205,16 +205,16 @@ module TweetStream
       delete_proc = query_parameters.delete(:delete) || self.on_delete
       limit_proc = query_parameters.delete(:limit) || self.on_limit
       error_proc = query_parameters.delete(:error) || self.on_error
-      
+
       uri = method == :get ? build_uri(path, version, query_parameters) : build_uri(path, version)
-      
+
       oauth = {
         :consumer_key => self.consumer_key,
         :consumer_secret => self.consumer_secret,
         :access_key => self.access_key,
         :access_secret => self.access_secret
       }
-      
+
       EventMachine::run {
         @stream = Twitter::JSONStream.connect(
           :path => uri,
@@ -228,24 +228,24 @@ module TweetStream
           :content => (method == :post ? build_post_body(query_parameters) : ''),
           :user_agent => 'TweetStream'
         )
-        
+
         @stream.each_item do |item|
           raw_hash = @parser.decode(item)
-          
+
           unless raw_hash.is_a?(::Hash)
             error_proc.call("Unexpected JSON object in stream: #{item}")
             next
           end
-          
+
           hash = TweetStream::Hash.new(raw_hash) # @parser.parse(item)
-          
+
           if hash[:delete] && hash[:delete][:status]
             delete_proc.call(hash[:delete][:status][:id], hash[:delete][:status][:user_id]) if delete_proc.is_a?(Proc)
           elsif hash[:limit] && hash[:limit][:track]
             limit_proc.call(hash[:limit][:track]) if limit_proc.is_a?(Proc)
           elsif hash[:text] && hash[:user]
             @last_status = TweetStream::Status.new(hash)
-            
+
             # Give the block the option to receive either one
             # or two arguments, depending on its arity.
             case block.arity
@@ -255,9 +255,9 @@ module TweetStream
                 yield @last_status, self
             end
           elsif hash[:for_user]
-            
+
             @last_status = TweetStream::Status.new(hash[:messages] || hash[:message])
-            
+
             # Give the block the option to receive either one
             # or two arguments, depending on its arity.
             case block.arity
@@ -268,23 +268,23 @@ module TweetStream
             end
           end
         end
-        
+
         @stream.on_error do |message|
           error_proc.call(message) if error_proc.is_a?(Proc)
         end
-        
+
         @stream.on_max_reconnects do |timeout, retries|
           raise TweetStream::ReconnectError.new(timeout, retries)
         end
       }
     end
-    
+
     # Terminate the currently running TweetStream.
     def stop
       EventMachine.stop_event_loop
       @last_status
     end
- 
+
     protected
 
     def parser_from(parser)
@@ -296,7 +296,7 @@ module TweetStream
           eval("TweetStream::Parsers::#{parser.to_s.split('_').map{|s| s.capitalize}.join('')}")
       end
     end
-    
+
     def build_uri(path, version = '1', query_parameters = {}) #:nodoc:
       URI.parse("/#{version}/#{path}.json#{build_query_parameters(query_parameters)}")
     end
@@ -304,11 +304,11 @@ module TweetStream
     def build_query_parameters(query)
       query.size > 0 ? "?#{build_post_body(query)}" : ''
     end
-    
+
     def build_post_body(query) #:nodoc:
       return '' unless query && query.is_a?(::Hash) && query.size > 0
       pairs = []
-      
+
       query.each_pair do |k,v|
         pairs << "#{k.to_s}=#{CGI.escape(v.to_s)}"
       end

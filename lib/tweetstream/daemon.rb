@@ -30,7 +30,7 @@ class TweetStream::Daemon < TweetStream::Client
     @app_name = app_name
     super(consumer_key, consumer_secret, access_key, access_secret, parser)
   end
-  
+
   def start(path, query_parameters = {}, &block) #:nodoc:
     Daemons.run_proc(@app_name || 'tweetstream', :multiple => true) do
       super(path, query_parameters, &block)
