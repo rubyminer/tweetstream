@@ -21,5 +21,5 @@ def sample_tweets
 end
 
 Spec::Runner.configure do |config|
-  
+
 end
